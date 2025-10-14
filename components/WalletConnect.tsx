@@ -28,16 +28,17 @@ export default function WalletConnect() {
   };
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-2 sm:gap-4">
       {/* 网络选择器 */}
       {isConnected && (
         <div className="relative">
           <button
             onClick={() => setShowNetworks(!showNetworks)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
           >
-            <Network className="w-4 h-4" />
-            <span>{getCurrentNetwork()?.chainName || '未知网络'}</span>
+            <Network className="w-4 h-4 flex-shrink-0" />
+            <span className="hidden sm:inline">{getCurrentNetwork()?.chainName || '未知网络'}</span>
+            <span className="sm:hidden">{getCurrentNetwork()?.nativeCurrency.symbol || 'ETH'}</span>
           </button>
 
           {/* 网络下拉菜单 */}
@@ -64,18 +65,19 @@ export default function WalletConnect() {
       {isConnected ? (
         <button
           onClick={disconnect}
-          className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+          className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm"
         >
-          <LogOut className="w-4 h-4" />
-          <span>{formatAddress(address!)}</span>
+          <LogOut className="w-4 h-4 flex-shrink-0" />
+          <span className="text-xs sm:text-sm">{formatAddress(address!)}</span>
         </button>
       ) : (
         <button
           onClick={connect}
-          className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+          className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm whitespace-nowrap"
         >
-          <Wallet className="w-4 h-4" />
-          <span>连接钱包</span>
+          <Wallet className="w-4 h-4 flex-shrink-0" />
+          <span className="hidden xs:inline sm:inline">连接钱包</span>
+          <span className="xs:hidden sm:hidden">连接</span>
         </button>
       )}
     </div>

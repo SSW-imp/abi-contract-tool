@@ -45,27 +45,30 @@ export default function MessageSigner() {
       <div className="space-y-4">
         {/* 消息输入 */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            待签名消息
-          </label>
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="输入消息或点击生成随机消息"
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              disabled={!isConnected}
-            />
+          <div className="flex items-center justify-between mb-2">
+            <label className="block text-sm font-medium text-gray-700">
+              待签名消息
+            </label>
             <button
               onClick={generateRandomMessage}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-1 px-3 py-1 text-sm bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={!isConnected}
             >
-              <RefreshCw className="w-4 h-4" />
-              生成
+              <RefreshCw className="w-3 h-3" />
+              生成随机
             </button>
           </div>
+          <textarea
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="输入要签名的消息（支持多行）&#10;或点击右上角「生成随机」按钮"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-y min-h-[100px] text-sm"
+            disabled={!isConnected}
+            rows={4}
+          />
+          <p className="mt-1 text-xs text-gray-500">
+            💡 提示：支持多行文本输入，适合移动端和桌面端
+          </p>
         </div>
 
         {/* 签名按钮 */}
