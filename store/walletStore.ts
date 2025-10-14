@@ -30,9 +30,19 @@ export const useWalletStore = create<WalletState>((set, get) => ({
   connect: async () => {
     try {
       if (!window.ethereum) {
-        alert('请安装 MetaMask 钱包');
+        alert('请安装支持 EVM 的钱包扩展（如 MetaMask、OKX Wallet、Trust Wallet 等）');
         return;
       }
+
+      // 检测钱包类型（可选，用于日志）
+      const walletName = window.ethereum.isMetaMask ? 'MetaMask' 
+        : window.ethereum.isOkxWallet ? 'OKX Wallet'
+        : window.ethereum.isTrust ? 'Trust Wallet'
+        : window.ethereum.isCoinbaseWallet ? 'Coinbase Wallet'
+        : window.ethereum.isRabby ? 'Rabby Wallet'
+        : 'Unknown Wallet';
+      
+      console.log(`正在连接钱包: ${walletName}`);
 
       // 请求账户权限
       const accounts = await window.ethereum.request({
@@ -71,10 +81,12 @@ export const useWalletStore = create<WalletState>((set, get) => ({
       window.ethereum.on('chainChanged', (chainId: string) => {
         set({ chainId });
         // 刷新 provider 和 signer
-        const newProvider = new BrowserProvider(window.ethereum);
-        newProvider.getSigner().then((signer) => {
-          set({ provider: newProvider, signer });
-        });
+        if (window.ethereum) {
+          const newProvider = new BrowserProvider(window.ethereum);
+          newProvider.getSigner().then((signer) => {
+            set({ provider: newProvider, signer });
+          });
+        }
       });
 
     } catch (error) {
@@ -148,7 +160,20 @@ export const useWalletStore = create<WalletState>((set, get) => ({
 // 类型扩展：添加 ethereum 到 window
 declare global {
   interface Window {
-    ethereum?: any;
+    ethereum?: {
+      request: (args: { method: string; params?: any[] }) => Promise<any>;
+      on: (event: string, handler: (...args: any[]) => void) => void;
+      removeListener: (event: string, handler: (...args: any[]) => void) => void;
+      isMetaMask?: boolean;
+      isOkxWallet?: boolean;
+      isTrust?: boolean;
+      isCoinbaseWallet?: boolean;
+      isRabby?: boolean;
+      isBraveWallet?: boolean;
+      isTokenPocket?: boolean;
+      isBitKeep?: boolean;
+      isImToken?: boolean;
+    };
   }
 }
 

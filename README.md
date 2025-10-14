@@ -4,13 +4,14 @@
 
 ## ✨ 功能特性
 
-- ✅ **钱包连接**：支持 MetaMask 钱包连接
-- ✅ **消息签名**：对随机字符串消息进行签名验证
+- ✅ **钱包连接**：支持所有兼容 EIP-1193 的钱包（MetaMask、OKX Wallet、Trust Wallet、Coinbase Wallet 等）
+- ✅ **消息签名**：对随机字符串消息进行签名验证（支持多行文本输入）
 - ✅ **多链切换**：支持 Ethereum、Sepolia、Polygon、BSC 等 EVM 兼容链
 - ✅ **ABI 解析**：输入合约 ABI JSON 和地址，自动生成交互界面
 - ✅ **动态调用**：根据 ABI 生成输入框和调用按钮
 - ✅ **智能识别**：自动区分只读函数（view/pure）和写入函数（nonpayable/payable）
 - ✅ **结果展示**：实时显示调用结果和交易哈希
+- ✅ **响应式设计**：支持桌面端和移动端 H5
 
 ## 🛠️ 技术栈
 
@@ -48,7 +49,21 @@ npm start
 
 ### 1️⃣ 连接钱包
 
-点击右上角「连接钱包」按钮，授权 MetaMask 钱包连接。
+点击右上角「连接钱包」按钮，授权您的 Web3 钱包连接。
+
+**支持的钱包**（基于 EIP-1193 标准）：
+- 🦊 MetaMask
+- 🅾️ OKX Wallet
+- 🛡️ Trust Wallet
+- 💙 Coinbase Wallet
+- 🐰 Rabby Wallet
+- 🦁 Brave Wallet
+- 🔷 TokenPocket
+- 💎 BitKeep (Bitget Wallet)
+- ⚡ imToken
+- 📱 Math Wallet
+
+以及其他所有兼容 EIP-1193 标准的 EVM 钱包。
 
 ### 2️⃣ 切换网络
 
