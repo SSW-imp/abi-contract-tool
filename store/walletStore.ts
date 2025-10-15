@@ -110,22 +110,69 @@ export const useWalletStore = create<WalletState>((set, get) => ({
   switchNetwork: async (chainId: string) => {
     try {
       if (!window.ethereum) {
-        throw new Error('未安装 MetaMask');
+        throw new Error('未安装钱包扩展');
       }
 
+      // 尝试切换网络
       await window.ethereum.request({
         method: 'wallet_switchEthereumChain',
         params: [{ chainId }],
       });
 
-      set({ chainId });
+      // 切换成功后，等待一下再更新状态
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // 重新获取当前链 ID（确保同步）
+      const currentChainId = await window.ethereum.request({
+        method: 'eth_chainId',
+      });
+      
+      set({ chainId: currentChainId });
 
     } catch (error: any) {
-      // 如果网络不存在，尝试添加
+      console.error('切换网络错误:', error);
+      
+      // 错误代码 4902: 钱包中不存在该网络，需要先添加
       if (error.code === 4902) {
-        console.log('网络不存在，需要添加网络');
+        try {
+          // 动态导入网络配置
+          const { SUPPORTED_NETWORKS } = await import('@/types');
+          const networkConfig = SUPPORTED_NETWORKS[chainId];
+          
+          if (!networkConfig) {
+            throw new Error('不支持的网络');
+          }
+
+          // 添加网络到钱包
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [
+              {
+                chainId: networkConfig.chainId,
+                chainName: networkConfig.chainName,
+                nativeCurrency: networkConfig.nativeCurrency,
+                rpcUrls: networkConfig.rpcUrls,
+                blockExplorerUrls: networkConfig.blockExplorerUrls,
+              },
+            ],
+          });
+
+          // 添加成功后，更新状态
+          set({ chainId });
+          
+        } catch (addError: any) {
+          console.error('添加网络失败:', addError);
+          throw new Error(`添加网络失败: ${addError.message}`);
+        }
+      } 
+      // 错误代码 4001: 用户拒绝切换
+      else if (error.code === 4001) {
+        throw new Error('用户取消了切换网络');
       }
-      throw error;
+      // 其他错误
+      else {
+        throw new Error(error.message || '切换网络失败');
+      }
     }
   },
 
