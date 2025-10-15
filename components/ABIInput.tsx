@@ -2,6 +2,7 @@
 
 import { FileJson, MapPin } from 'lucide-react';
 import { useState } from 'react';
+import { useWalletStore } from '@/store/walletStore';
 
 interface ABIInputProps {
   onABIChange: (abi: any[]) => void;
@@ -9,6 +10,7 @@ interface ABIInputProps {
 }
 
 export default function ABIInput({ onABIChange, onAddressChange }: ABIInputProps) {
+  const { chainId } = useWalletStore();
   const [abiText, setAbiText] = useState('');
   const [contractAddress, setContractAddress] = useState('');
   const [error, setError] = useState('');
@@ -68,9 +70,68 @@ export default function ABIInput({ onABIChange, onAddressChange }: ABIInputProps
     onAddressChange(address);
   };
 
-  // 加载示例 ERC20 ABI
+  // 根据当前链获取 USDC 合约地址
+  const getUSDCAddress = (currentChainId: string | null) => {
+    const usdcAddresses: Record<string, { address: string; name: string }> = {
+      '0x1': { 
+        address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', 
+        name: 'USDC (Ethereum Mainnet)' 
+      },
+      '0xaa36a7': { 
+        address: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238', 
+        name: 'USDC (Sepolia Testnet)' 
+      },
+      '0x89': { 
+        address: '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359', 
+        name: 'USDC (Polygon)' 
+      },
+      '0x38': { 
+        address: '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d', 
+        name: 'USDC (BSC)' 
+      },
+    };
+
+    return usdcAddresses[currentChainId || '0x1'] || usdcAddresses['0x1'];
+  };
+
+  // 加载示例 ERC20 ABI（USDC 合约）
   const loadExampleABI = () => {
+    // 检查是否连接钱包
+    if (!chainId) {
+      alert('⚠️ 请先连接钱包！');
+      return;
+    }
+
+    // 真实的 USDC 合约 ABI（简化版，包含常用函数）
     const exampleABI = [
+      {
+        "type": "function",
+        "name": "name",
+        "inputs": [],
+        "outputs": [{ "name": "", "type": "string" }],
+        "stateMutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "symbol",
+        "inputs": [],
+        "outputs": [{ "name": "", "type": "string" }],
+        "stateMutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "decimals",
+        "inputs": [],
+        "outputs": [{ "name": "", "type": "uint8" }],
+        "stateMutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "totalSupply",
+        "inputs": [],
+        "outputs": [{ "name": "", "type": "uint256" }],
+        "stateMutability": "view"
+      },
       {
         "type": "function",
         "name": "balanceOf",
@@ -90,6 +151,16 @@ export default function ABIInput({ onABIChange, onAddressChange }: ABIInputProps
       },
       {
         "type": "function",
+        "name": "allowance",
+        "inputs": [
+          { "name": "owner", "type": "address" },
+          { "name": "spender", "type": "address" }
+        ],
+        "outputs": [{ "name": "", "type": "uint256" }],
+        "stateMutability": "view"
+      },
+      {
+        "type": "function",
         "name": "approve",
         "inputs": [
           { "name": "spender", "type": "address" },
@@ -100,16 +171,30 @@ export default function ABIInput({ onABIChange, onAddressChange }: ABIInputProps
       },
       {
         "type": "function",
-        "name": "totalSupply",
-        "inputs": [],
-        "outputs": [{ "name": "", "type": "uint256" }],
-        "stateMutability": "view"
+        "name": "transferFrom",
+        "inputs": [
+          { "name": "from", "type": "address" },
+          { "name": "to", "type": "address" },
+          { "name": "amount", "type": "uint256" }
+        ],
+        "outputs": [{ "name": "", "type": "bool" }],
+        "stateMutability": "nonpayable"
       }
     ];
 
     const abiString = JSON.stringify(exampleABI, null, 2);
     setAbiText(abiString);
     handleABIChange(abiString);
+    
+    // 根据当前链获取对应的 USDC 合约地址
+    const usdcInfo = getUSDCAddress(chainId);
+    setContractAddress(usdcInfo.address);
+    handleAddressChange(usdcInfo.address);
+    
+    console.log('✅ 已加载 USDC 合约示例');
+    console.log('📍 合约地址:', usdcInfo.address);
+    console.log('🌐 网络:', usdcInfo.name);
+    console.log('💡 提示: 如果切换网络，请重新点击「加载示例」');
   };
 
   return (
@@ -139,9 +224,9 @@ export default function ABIInput({ onABIChange, onAddressChange }: ABIInputProps
             </label>
             <button
               onClick={loadExampleABI}
-              className="text-xs text-blue-600 hover:text-blue-700 underline"
+              className="text-xs text-blue-600 hover:text-blue-700 underline font-medium"
             >
-              加载示例 (ERC20)
+              加载示例 (USDC)
             </button>
           </div>
           <textarea
@@ -162,11 +247,27 @@ export default function ABIInput({ onABIChange, onAddressChange }: ABIInputProps
 
         {/* 使用提示 */}
         <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+          <p className="text-xs text-blue-800 mb-2">
+            💡 <strong>快速开始：</strong>点击右上角「加载示例 (USDC)」按钮，自动填充当前网络的 USDC 合约地址和 ABI。
+          </p>
           <p className="text-xs text-blue-800">
-            💡 提示：输入编译好的合约 ABI JSON 字符串，系统将自动解析并生成调用界面。
-            目前仅支持基本类型参数（address、uint256、bool、string 等）。
+            ⚠️ <strong>注意：</strong>不同链上的合约地址不同。切换网络后，请重新点击「加载示例」获取正确的合约地址。
           </p>
         </div>
+        
+        {/* 当前网络提示 */}
+        {chainId && (
+          <div className="p-3 bg-slate-50 border border-slate-200 rounded-md">
+            <p className="text-xs text-slate-700">
+              🌐 <strong>当前网络：</strong>
+              {chainId === '0x1' && ' Ethereum Mainnet'}
+              {chainId === '0xaa36a7' && ' Sepolia Testnet'}
+              {chainId === '0x89' && ' Polygon Mainnet'}
+              {chainId === '0x38' && ' BSC Mainnet'}
+              {!['0x1', '0xaa36a7', '0x89', '0x38'].includes(chainId) && ` ${chainId}`}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

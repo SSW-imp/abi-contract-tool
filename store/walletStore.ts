@@ -66,6 +66,16 @@ export const useWalletStore = create<WalletState>((set, get) => ({
         signer,
       });
 
+      // ✅ 连接成功提示
+      const { SUPPORTED_NETWORKS } = await import('@/types');
+      const networkName = SUPPORTED_NETWORKS[chainId]?.chainName || '未知网络';
+      
+      console.log(`✅ 钱包连接成功！`);
+      console.log(`👛 钱包类型: ${walletName}`);
+      console.log(`📍 钱包地址: ${accounts[0]}`);
+      console.log(`🌐 当前网络: ${networkName} (${chainId})`);
+      console.log(`💰 原生代币: ${SUPPORTED_NETWORKS[chainId]?.nativeCurrency.symbol || 'Unknown'}`);
+
       // 监听账户变化
       window.ethereum.on('accountsChanged', (accounts: string[]) => {
         if (accounts.length === 0) {
@@ -78,13 +88,23 @@ export const useWalletStore = create<WalletState>((set, get) => ({
       });
 
       // 监听链变化
-      window.ethereum.on('chainChanged', (chainId: string) => {
+      window.ethereum.on('chainChanged', async (chainId: string) => {
+        console.log(`🔄 检测到链变化: ${chainId}`);
+        
         set({ chainId });
+        
         // 刷新 provider 和 signer
         if (window.ethereum) {
           const newProvider = new BrowserProvider(window.ethereum);
           newProvider.getSigner().then((signer) => {
             set({ provider: newProvider, signer });
+            
+            // 获取网络名称
+            import('@/types').then(({ SUPPORTED_NETWORKS }) => {
+              const networkName = SUPPORTED_NETWORKS[chainId]?.chainName || '未知网络';
+              console.log(`✅ Provider 和 Signer 已更新`);
+              console.log(`📍 当前网络: ${networkName} (${chainId})`);
+            });
           });
         }
       });
@@ -113,6 +133,13 @@ export const useWalletStore = create<WalletState>((set, get) => ({
         throw new Error('未安装钱包扩展');
       }
 
+      // 获取网络配置（用于日志）
+      const { SUPPORTED_NETWORKS } = await import('@/types');
+      const networkConfig = SUPPORTED_NETWORKS[chainId];
+      const networkName = networkConfig?.chainName || chainId;
+
+      console.log(`🔄 正在切换到网络: ${networkName} (${chainId})`);
+
       // 尝试切换网络
       await window.ethereum.request({
         method: 'wallet_switchEthereumChain',
@@ -129,8 +156,13 @@ export const useWalletStore = create<WalletState>((set, get) => ({
       
       set({ chainId: currentChainId });
 
+      // ✅ 切换成功提示
+      console.log(`网络切换成功: ${networkName}`);
+      console.log(`当前链 ID: ${currentChainId}`);
+      console.log(`原生代币: ${networkConfig?.nativeCurrency.symbol || 'Unknown'}`);
+
     } catch (error: any) {
-      console.error('切换网络错误:', error);
+      console.error('❌ 切换网络错误:', error);
       
       // 错误代码 4902: 钱包中不存在该网络，需要先添加
       if (error.code === 4902) {
@@ -143,8 +175,10 @@ export const useWalletStore = create<WalletState>((set, get) => ({
             throw new Error('不支持的网络');
           }
 
+          console.log(`网络不存在，正在添加: ${networkConfig.chainName}`);
+
           // 添加网络到钱包
-          await window.ethereum.request({
+          await window.ethereum!.request({
             method: 'wallet_addEthereumChain',
             params: [
               {
@@ -160,13 +194,20 @@ export const useWalletStore = create<WalletState>((set, get) => ({
           // 添加成功后，更新状态
           set({ chainId });
           
+          // ✅ 添加并切换成功提示
+          console.log(`网络添加成功: ${networkConfig.chainName}`);
+          console.log(`已自动切换到新网络`);
+          console.log(`链 ID: ${chainId}`);
+          console.log(`原生代币: ${networkConfig.nativeCurrency.symbol}`);
+          
         } catch (addError: any) {
-          console.error('添加网络失败:', addError);
+          console.error('❌ 添加网络失败:', addError);
           throw new Error(`添加网络失败: ${addError.message}`);
         }
       } 
       // 错误代码 4001: 用户拒绝切换
       else if (error.code === 4001) {
+        console.log('用户取消了切换网络');
         throw new Error('用户取消了切换网络');
       }
       // 其他错误

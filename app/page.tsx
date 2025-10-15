@@ -94,7 +94,6 @@ export default function Home() {
       <footer className="mt-12 pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-slate-500">
           <p>Built with Next.js 14 + TypeScript + Ethers.js v6</p>
-          <p className="mt-1">支持所有 EIP-1193 兼容钱包 | 支持 EVM 兼容链</p>
         </div>
       </footer>
     </div>
