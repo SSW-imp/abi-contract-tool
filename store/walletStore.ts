@@ -9,6 +9,10 @@ interface WalletState {
   provider: BrowserProvider | null;
   signer: JsonRpcSigner | null;
   
+  // 事件处理器引用（用于清理）
+  accountsChangedHandler: ((accounts: string[]) => void) | null;
+  chainChangedHandler: ((chainId: string) => void) | null;
+  
   // 方法
   connect: () => Promise<void>;
   disconnect: () => void;
@@ -25,6 +29,8 @@ export const useWalletStore = create<WalletState>((set, get) => ({
   isConnected: false,
   provider: null,
   signer: null,
+  accountsChangedHandler: null,
+  chainChangedHandler: null,
 
   // 连接钱包
   connect: async () => {
@@ -76,8 +82,8 @@ export const useWalletStore = create<WalletState>((set, get) => ({
       console.log(`🌐 当前网络: ${networkName} (${chainId})`);
       console.log(`💰 原生代币: ${SUPPORTED_NETWORKS[chainId]?.nativeCurrency.symbol || 'Unknown'}`);
 
-      // 监听账户变化
-      window.ethereum.on('accountsChanged', (accounts: string[]) => {
+      // 创建事件处理器
+      const accountsChangedHandler = (accounts: string[]) => {
         if (accounts.length === 0) {
           get().disconnect();
         } else {
@@ -85,10 +91,9 @@ export const useWalletStore = create<WalletState>((set, get) => ({
           // 重新获取 signer
           provider.getSigner().then((signer) => set({ signer }));
         }
-      });
+      };
 
-      // 监听链变化
-      window.ethereum.on('chainChanged', async (chainId: string) => {
+      const chainChangedHandler = async (chainId: string) => {
         console.log(`🔄 检测到链变化: ${chainId}`);
         
         set({ chainId });
@@ -107,7 +112,16 @@ export const useWalletStore = create<WalletState>((set, get) => ({
             });
           });
         }
-      });
+      };
+
+      // 保存处理器引用
+      set({ accountsChangedHandler, chainChangedHandler });
+
+      // 监听账户变化
+      window.ethereum.on('accountsChanged', accountsChangedHandler);
+
+      // 监听链变化
+      window.ethereum.on('chainChanged', chainChangedHandler);
 
     } catch (error) {
       console.error('连接钱包失败:', error);
@@ -117,10 +131,16 @@ export const useWalletStore = create<WalletState>((set, get) => ({
 
   // 断开连接
   disconnect: () => {
+    const state = get();
+    
     // 清理事件监听器，防止内存泄漏
     if (window.ethereum) {
-      window.ethereum.removeAllListeners?.('accountsChanged');
-      window.ethereum.removeAllListeners?.('chainChanged');
+      if (state.accountsChangedHandler) {
+        window.ethereum.removeListener('accountsChanged', state.accountsChangedHandler);
+      }
+      if (state.chainChangedHandler) {
+        window.ethereum.removeListener('chainChanged', state.chainChangedHandler);
+      }
     }
     
     set({
@@ -129,6 +149,8 @@ export const useWalletStore = create<WalletState>((set, get) => ({
       isConnected: false,
       provider: null,
       signer: null,
+      accountsChangedHandler: null,
+      chainChangedHandler: null,
     });
   },
 
