@@ -113,12 +113,12 @@ export default function ABIInput({ onABIChange, onAddressChange }: ABIInputProps
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className="bg-white border border-slate-200 rounded-lg p-6">
       <div className="space-y-4">
         {/* 合约地址输入 */}
         <div>
-          <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-            <MapPin className="w-4 h-4 text-orange-600" />
+          <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-2">
+            <MapPin className="w-4 h-4 text-blue-600" />
             合约地址
           </label>
           <input
@@ -126,15 +126,15 @@ export default function ABIInput({ onABIChange, onAddressChange }: ABIInputProps
             value={contractAddress}
             onChange={(e) => handleAddressChange(e.target.value)}
             placeholder="0x..."
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent font-mono text-sm"
+            className="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
           />
         </div>
 
         {/* ABI JSON 输入 */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-              <FileJson className="w-4 h-4 text-orange-600" />
+            <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+              <FileJson className="w-4 h-4 text-blue-600" />
               合约 ABI (JSON)
             </label>
             <button
@@ -148,20 +148,20 @@ export default function ABIInput({ onABIChange, onAddressChange }: ABIInputProps
             value={abiText}
             onChange={(e) => handleABIChange(e.target.value)}
             placeholder='[{"type":"function","name":"balanceOf","inputs":[{"name":"account","type":"address"}],...}]'
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent font-mono text-xs resize-y"
+            className="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-xs resize-y"
             rows={10}
           />
         </div>
 
         {/* 错误提示 */}
         {error && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-600">{error}</p>
+          <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+            <p className="text-sm text-red-700">{error}</p>
           </div>
         )}
 
         {/* 使用提示 */}
-        <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
           <p className="text-xs text-blue-800">
             💡 提示：输入编译好的合约 ABI JSON 字符串，系统将自动解析并生成调用界面。
             目前仅支持基本类型参数（address、uint256、bool、string 等）。

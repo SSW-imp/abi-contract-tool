@@ -200,7 +200,7 @@ export default function ContractInteraction({ abi, contractAddress }: ContractIn
         <select
           value={value}
           onChange={(e) => handleInputChange(functionName, input.name, e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+          className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
         >
           <option value="">选择值</option>
           <option value="true">true</option>
@@ -216,7 +216,7 @@ export default function ContractInteraction({ abi, contractAddress }: ContractIn
         value={value}
         onChange={(e) => handleInputChange(functionName, input.name, e.target.value)}
         placeholder={`${input.type}${input.name ? ` ${input.name}` : ''}`}
-        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+        className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
       />
     );
   };
@@ -225,15 +225,15 @@ export default function ContractInteraction({ abi, contractAddress }: ContractIn
   const getStateMutabilityBadge = (stateMutability: string) => {
     const badges = {
       view: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'View' },
-      pure: { bg: 'bg-green-100', text: 'text-green-700', label: 'Pure' },
-      nonpayable: { bg: 'bg-orange-100', text: 'text-orange-700', label: 'Write' },
-      payable: { bg: 'bg-red-100', text: 'text-red-700', label: 'Payable' },
+      pure: { bg: 'bg-emerald-100', text: 'text-emerald-700', label: 'Pure' },
+      nonpayable: { bg: 'bg-amber-100', text: 'text-amber-700', label: 'Write' },
+      payable: { bg: 'bg-rose-100', text: 'text-rose-700', label: 'Payable' },
     };
 
     const badge = badges[stateMutability as keyof typeof badges] || badges.nonpayable;
 
     return (
-      <span className={`px-2 py-1 text-xs font-medium rounded ${badge.bg} ${badge.text}`}>
+      <span className={`px-2 py-1 text-xs font-medium rounded-md ${badge.bg} ${badge.text}`}>
         {badge.label}
       </span>
     );
@@ -241,17 +241,17 @@ export default function ContractInteraction({ abi, contractAddress }: ContractIn
 
   if (functions.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <p className="text-gray-500 text-center">请输入有效的 ABI 以生成合约交互界面</p>
+      <div className="bg-white border border-slate-200 rounded-lg p-6">
+        <p className="text-slate-500 text-center">请输入有效的 ABI 以生成合约交互界面</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg shadow-md p-6 text-white">
+      <div className="bg-blue-600 border border-blue-700 rounded-lg p-6 text-white">
         <h2 className="text-2xl font-bold mb-2">合约交互面板</h2>
-        <p className="text-indigo-100">共找到 {functions.length} 个可调用函数</p>
+        <p className="text-blue-100">共找到 {functions.length} 个可调用函数</p>
       </div>
 
       {functions.map((func, index) => {
@@ -261,16 +261,16 @@ export default function ContractInteraction({ abi, contractAddress }: ContractIn
         const isLoading = loading[functionName];
 
         return (
-          <div key={index} className="bg-white rounded-lg shadow-md p-6">
+          <div key={index} className="bg-white border border-slate-200 rounded-lg p-6">
             {/* 函数头部 */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 {isReadOnly ? (
                   <Eye className="w-5 h-5 text-blue-600" />
                 ) : (
-                  <Send className="w-5 h-5 text-orange-600" />
+                  <Send className="w-5 h-5 text-amber-600" />
                 )}
-                <h3 className="text-lg font-bold text-gray-800">{functionName}</h3>
+                <h3 className="text-lg font-bold text-slate-900">{functionName}</h3>
                 {getStateMutabilityBadge(func.stateMutability)}
               </div>
             </div>
@@ -280,9 +280,9 @@ export default function ContractInteraction({ abi, contractAddress }: ContractIn
               <div className="space-y-3 mb-4">
                 {func.inputs.map((input, idx) => (
                   <div key={idx}>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-slate-700 mb-1">
                       {input.name || `参数${idx + 1}`}
-                      <span className="text-gray-500 ml-2">({input.type})</span>
+                      <span className="text-slate-500 ml-2">({input.type})</span>
                     </label>
                     {renderInput(func, input)}
                   </div>
@@ -294,10 +294,10 @@ export default function ContractInteraction({ abi, contractAddress }: ContractIn
             <button
               onClick={() => handleCallFunction(func)}
               disabled={!isConnected || isLoading}
-              className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+              className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                 isReadOnly
                   ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                  : 'bg-orange-600 hover:bg-orange-700 text-white'
+                  : 'bg-amber-600 hover:bg-amber-700 text-white'
               }`}
             >
               {isLoading ? (
@@ -317,23 +317,23 @@ export default function ContractInteraction({ abi, contractAddress }: ContractIn
             {result && (
               <div className="mt-4">
                 {result.success ? (
-                  <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                    <div className="text-sm font-medium text-green-800 mb-2">✓ 调用成功</div>
+                  <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-md">
+                    <div className="text-sm font-medium text-emerald-800 mb-2">✓ 调用成功</div>
                     {result.data && (
-                      <div className="text-xs text-gray-700 font-mono break-all whitespace-pre-wrap">
+                      <div className="text-xs text-slate-700 font-mono break-all whitespace-pre-wrap">
                         {result.data}
                       </div>
                     )}
                     {result.txHash && (
-                      <div className="mt-2 text-xs text-green-700">
+                      <div className="mt-2 text-xs text-emerald-700">
                         交易哈希: <span className="font-mono">{result.txHash}</span>
                       </div>
                     )}
                   </div>
                 ) : (
-                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-md">
                     <div className="text-sm font-medium text-red-800 mb-1">✗ 调用失败</div>
-                    <div className="text-xs text-red-600">{result.error}</div>
+                    <div className="text-xs text-red-700">{result.error}</div>
                   </div>
                 )}
               </div>
