@@ -117,6 +117,12 @@ export const useWalletStore = create<WalletState>((set, get) => ({
 
   // 断开连接
   disconnect: () => {
+    // 清理事件监听器，防止内存泄漏
+    if (window.ethereum) {
+      window.ethereum.removeAllListeners?.('accountsChanged');
+      window.ethereum.removeAllListeners?.('chainChanged');
+    }
+    
     set({
       address: null,
       chainId: null,

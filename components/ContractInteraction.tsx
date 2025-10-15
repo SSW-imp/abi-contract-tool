@@ -115,6 +115,12 @@ export default function ContractInteraction({ abi, contractAddress }: ContractIn
         throw new Error('合约地址格式不正确');
       }
 
+      // 验证合约是否存在
+      const code = await provider.getCode(contractAddress);
+      if (code === '0x') {
+        throw new Error('该地址不是合约地址或合约不存在');
+      }
+
       // 解析输入参数
       const args: any[] = [];
       for (const input of func.inputs) {
@@ -160,7 +166,13 @@ export default function ContractInteraction({ abi, contractAddress }: ContractIn
 
       } else {
         // 写入调用（需要签名）
-        const tx = await contract[functionName](...args);
+        // 先估算 Gas
+        const estimatedGas = await contract[functionName].estimateGas(...args);
+        
+        // 发送交易（添加 20% Gas 余量）
+        const tx = await contract[functionName](...args, {
+          gasLimit: (estimatedGas * 120n) / 100n,
+        });
         
         // 等待交易确认
         const receipt = await tx.wait();
