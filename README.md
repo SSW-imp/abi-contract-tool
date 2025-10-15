@@ -150,37 +150,7 @@ npm run build
 npm start
 ```
 
-## 🔗 示例合约
 
-### ERC20 代币（Sepolia 测试网）
 
-- **合约地址**: `0x...`（需替换为实际地址）
-- **网络**: Sepolia Testnet
-- **功能**: `balanceOf`、`transfer`、`approve`、`totalSupply`
 
-### 自定义合约
-
-您可以在 [Remix IDE](https://remix.ethereum.org/) 编写和部署合约，然后：
-
-1. 复制合约地址
-2. 复制编译后的 ABI
-3. 粘贴到本工具进行交互
-
-## 🤝 参考项目
-
-- [Remix IDE](https://remix.ethereum.org/) - Solidity 在线开发环境
-- [Ethers.js](https://docs.ethers.org/v6/) - 以太坊 JavaScript 库
-- [MetaMask](https://metamask.io/) - 以太坊钱包
-
-## 📄 License
-
-MIT License
-
-## 👨‍💻 作者
-
-王少文 - Web3 前端开发工程师
-
----
-
-**⭐ 如果这个项目对您有帮助，请给个 Star！**
 
